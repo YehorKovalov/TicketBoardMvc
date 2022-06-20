@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TicketBoard.MvcClient", "TicketBoard.MvcClient\TicketBoard.MvcClient.csproj", "{3285BACC-7CCF-479F-B974-3F75EF9F8762}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TicketBoard.DAL", "TicketBoard.DAL\TicketBoard.DAL.csproj", "{7C0755F2-46D6-4ED3-BCA0-F9C9AD3C4359}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TicketBoard.BLL", "TicketBoard.BLL\TicketBoard.BLL.csproj", "{F6182047-E290-4B08-B84C-F3A55BCAE452}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3285BACC-7CCF-479F-B974-3F75EF9F8762}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3285BACC-7CCF-479F-B974-3F75EF9F8762}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3285BACC-7CCF-479F-B974-3F75EF9F8762}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3285BACC-7CCF-479F-B974-3F75EF9F8762}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7C0755F2-46D6-4ED3-BCA0-F9C9AD3C4359}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7C0755F2-46D6-4ED3-BCA0-F9C9AD3C4359}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7C0755F2-46D6-4ED3-BCA0-F9C9AD3C4359}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7C0755F2-46D6-4ED3-BCA0-F9C9AD3C4359}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F6182047-E290-4B08-B84C-F3A55BCAE452}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F6182047-E290-4B08-B84C-F3A55BCAE452}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F6182047-E290-4B08-B84C-F3A55BCAE452}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F6182047-E290-4B08-B84C-F3A55BCAE452}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
