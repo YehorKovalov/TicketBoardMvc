@@ -1,6 +1,6 @@
-namespace TicketBoard.MvcClient.Models;
+namespace TicketBoard.BLL.Models;
 
-public class TicketViewModel
+public class TicketWithRelatedDataDto
 {
     public int TicketId { get; set; }
 
@@ -8,5 +8,5 @@ public class TicketViewModel
     public string? Description { get; set; }
     public DateTime Date { get; set; }
     public int PlaceId { get; set; }
-    public PlaceViewModel Place { get; set; } = null!;
+    public PlaceDto Place { get; set; } = null!;
 }
