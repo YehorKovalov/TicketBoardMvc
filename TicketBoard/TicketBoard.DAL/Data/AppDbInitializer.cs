@@ -14,57 +14,75 @@ public class AppDbInitializer : IDbInitializer<AppDbContext>
             await dbContext.Database.MigrateAsync();
         }
 
-        var tickets = GetTickets();
+        if (!await dbContext.Locations.AnyAsync())
+        {
+            var locations = GetLocations();
+            await dbContext.AddRangeAsync(locations);
+            await dbContext.SaveChangesAsync();
+        }
+        
+        if (!await dbContext.Places.AnyAsync())
+        {
+            var places = GetPlaces();
+            await dbContext.AddRangeAsync(places);
+            await dbContext.SaveChangesAsync();
+        }
+
         if (!await dbContext.Tickets.AnyAsync())
         {
+            var tickets = GetTickets();
             await dbContext.AddRangeAsync(tickets);
             await dbContext.SaveChangesAsync();
         }
     }
 
-    private IEnumerable<TicketEntity> GetTickets() => new List<TicketEntity>
+    private IEnumerable<PlaceEntity> GetPlaces(int amountForEachLocation = 2)
     {
-        new TicketEntity
+        var places = new List<PlaceEntity>();
+        var locationsAmount = GetLocations().Count() - 1;
+
+        var resultAmount = amountForEachLocation * locationsAmount;
+        for (var i = 1; i <= resultAmount; i++)
         {
-            Description = "It's long long description for this ticket.",
-            DestinationPlace = "Kharkiv Museum",
-            Title = "Museum 1"
-        },
-        new TicketEntity
-        {
-            Description = "It's long long description for this ticket.",
-            DestinationPlace = "Luhansk Museum",
-            Title = "Museum 2"
-        },
-        new TicketEntity
-        {
-            Description = "It's long long description for this ticket.",
-            DestinationPlace = "Kiev Museum",
-            Title = "Museum 3"
-        },
-        new TicketEntity
-        {
-            Description = "It's long long description for this ticket.",
-            DestinationPlace = "Kherson Museum",
-            Title = "Museum 4"
-        },
-        new TicketEntity
-        {
-            Description = "It's long long description for this ticket.",
-            DestinationPlace = "Lviv Museum",
-            Title = "Museum 5"
-        },
-        new TicketEntity
-        {
-            Description = "It's long long description for this ticket.",
-            DestinationPlace = "Donetsk Museum",
-            Title = "Museum 6"
-        },
-        new TicketEntity
-        {
-            Description = "It's long long description for this ticket.",
-            DestinationPlace = "Ivano-Frankovsk Museum",
-            Title = "Museum 7"
+            places.Add(new PlaceEntity
+            {
+                Name = $"Place Name {i}",
+                LocationId = i % locationsAmount + 1
+            });
         }
-    };
+
+        return places;
+    }
+
+    private IEnumerable<LocationEntity> GetLocations()
+    {
+        return new List<LocationEntity>
+        {
+            new LocationEntity { Name = "Kharkiv" },
+            new LocationEntity { Name = "Kiev" },
+            new LocationEntity { Name = "Lviv" }
+        };
+    }
+
+    private IEnumerable<TicketEntity> GetTickets(int amountForEachPlace = 2)
+    {
+        var random = new Random();
+        var tickets = new List<TicketEntity>();
+        var placesAmount = GetPlaces().Count() - 1;
+
+        var resultAmount = amountForEachPlace * placesAmount;
+
+        for (var i = 1; i <= resultAmount; i++)
+        {
+            tickets.Add(new TicketEntity
+            {
+                Price = random.Next(1000),
+                PlaceId = i % placesAmount + 1,
+                Description = "Long long description. Long long description. Long long description. Long long description. Long long description.",
+                Date = DateTime.UtcNow.AddDays(random.Next(100))
+            });
+        }
+
+        return tickets;
+    }
 }

@@ -10,8 +10,15 @@ public class MappingProfile : Profile
     public MappingProfile()
     {
         CreateMap<TicketEntity, TicketDto>();
-        
-        CreateMap<TicketDto, TicketViewModel>();
-        CreateMap<TicketDto, UpdateTicketViewModel>();
+        CreateMap<TicketEntity, TicketWithRelatedDataDto>();
+        CreateMap<TicketEntity, TicketWithoutRelatedDataDto>();
+        CreateMap<PlaceEntity, PlaceDto>();
+        CreateMap<LocationEntity, LocationDto>();
+
+        CreateMap<TicketDto, TicketsViewModel>();
+        CreateMap<TicketWithRelatedDataDto, TicketViewModel>();
+        CreateMap<TicketWithoutRelatedDataDto, TicketViewModel>();
+        CreateMap<LocationDto, LocationViewModel>();
+        CreateMap<PlaceDto, PlaceViewModel>();
     }
 }

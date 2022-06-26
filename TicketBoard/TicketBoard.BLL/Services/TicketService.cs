@@ -22,7 +22,19 @@ public class TicketService : ITicketService
         _mapper = mapper;
     }
 
-    public async Task<GetTicketByIdResponse<TicketDto?>?> GetTicketByIdAsync(int? ticketId)
+    public async Task<GetTicketByIdResponse<TicketWithRelatedDataDto?>?> GetTicketWithRelatedDataByIdAsync(int? ticketId)
+    {
+        if (ticketId is <= 0 or null)
+        {
+            return null;
+        }
+
+        var result = await _ticketRepository.GetById(ticketId.Value, true);
+        _logger.LogInformation($"ticket id = {result.TicketId}");
+        return new GetTicketByIdResponse<TicketWithRelatedDataDto?> { Data  = _mapper.Map<TicketWithRelatedDataDto>(result) };
+    }
+
+    public async Task<GetTicketByIdResponse<TicketWithoutRelatedDataDto?>?> GetTicketWithoutRelatedDataByIdAsync(int? ticketId)
     {
         if (ticketId is <= 0 or null)
         {
@@ -31,52 +43,53 @@ public class TicketService : ITicketService
 
         var result = await _ticketRepository.GetById(ticketId.Value);
         _logger.LogInformation($"ticket id = {result.TicketId}");
-        return new GetTicketByIdResponse<TicketDto?>
+        return new GetTicketByIdResponse<TicketWithoutRelatedDataDto?> { Data  = _mapper.Map<TicketWithoutRelatedDataDto>(result) };
+    }
+    
+    public async Task<GetAllTicketsResponse<TicketWithRelatedDataDto>> GetAllTicketsWithRelatedEntitiesAsync()
+    {
+        var result = await _ticketRepository.GetAll(true);
+        _logger.LogInformation($"tickets amount = {result.Count()}");
+        return new GetAllTicketsResponse<TicketWithRelatedDataDto>
         {
-            Data  = _mapper.Map<TicketDto>(result)
+            Data = result.Select(s => _mapper.Map<TicketWithRelatedDataDto>(s)).ToList()
         };
     }
 
-    public async Task<GetAllTicketsResponse<TicketDto>> GetAllTicketsAsync()
+    public async Task<GetAllTicketsResponse<TicketWithoutRelatedDataDto>> GetAllTicketsWithoutRelatedEntitiesAsync()
     {
         var result = await _ticketRepository.GetAll();
         _logger.LogInformation($"tickets amount = {result.Count()}");
-        return new GetAllTicketsResponse<TicketDto>
+        return new GetAllTicketsResponse<TicketWithoutRelatedDataDto>
         {
-            Data = result.Select(s => _mapper.Map<TicketDto>(s)).ToList()
+            Data = result.Select(s => _mapper.Map<TicketWithoutRelatedDataDto>(s)).ToList()
         };
     }
 
-    public async Task<AddTicketResponse<int>> AddTicketAsync(string title, string destinationPlace, string? description)
+    public async Task<AddTicketResponse<int>> AddTicketAsync(int placeId, string? description, DateTime date, double price)
     {
-        _logger.LogInformation($"State: {nameof(title)}: {title}; {nameof(destinationPlace)}: {destinationPlace}; {nameof(description)}: {description};");
-        var result = await _ticketRepository.Add(title, destinationPlace, description);
+        _logger.LogInformation($"State: {nameof(placeId)}: {placeId}; {nameof(date)}: {date}; {nameof(description)}: {description}; {nameof(price)}: {price};");
+        var result = await _ticketRepository.Add(placeId, description, date, price);
         _logger.LogInformation($"ticket id = {result}");
         if (result is null)
         {
             throw new Exception($"{nameof(AddTicketAsync)} ---> result is null");
         }
 
-        return new AddTicketResponse<int>
-        {
-            Data = result.Value
-        };
+        return new AddTicketResponse<int> { Data = result.Value };
     }
 
-    public async Task<UpdateTicketResponse<int>> UpdateTicketAsync(int ticketId, string title, string destinationPlace, string? description)
+    public async Task<UpdateTicketResponse<int>> UpdateTicketAsync(int ticketId, int placeId, string? description, DateTime date, double price)
     {
-        _logger.LogInformation($"State: {nameof(ticketId)}: {ticketId}; {nameof(title)}: {title}; {nameof(destinationPlace)}: {destinationPlace}; {nameof(description)}: {description};");
-        var result = await _ticketRepository.Update(ticketId, title, destinationPlace, description);
+        _logger.LogInformation($"State: {nameof(ticketId)}: {ticketId}; {nameof(placeId)}: {placeId}; {nameof(date)}: {date}; {nameof(description)}: {description}; {nameof(price)}: {price};");
+        var result = await _ticketRepository.Update(ticketId, placeId, description, date, price);
         _logger.LogInformation($"ticket id = {result}");
         if (result is null)
         {
             throw new Exception($"{nameof(UpdateTicketAsync)} ---> result is null");
         }
 
-        return new UpdateTicketResponse<int>
-        {
-            Data = result.Value
-        };
+        return new UpdateTicketResponse<int> { Data = result.Value };
     }
 
     public async Task<DeleteTicketResponse<int?>> DeleteTicketByIdAsync(int? ticketId)
@@ -93,9 +106,6 @@ public class TicketService : ITicketService
             throw new Exception($"{nameof(DeleteTicketByIdAsync)} ---> result is null");
         }
 
-        return new DeleteTicketResponse<int?>
-        {
-            Data = result.Value
-        };
+        return new DeleteTicketResponse<int?> { Data = result.Value };
     }
 }

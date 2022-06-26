@@ -4,17 +4,7 @@ namespace TicketBoard.MvcClient.Models;
 
 public class UpdateTicketViewModel
 {
-    public int TicketId { get; set; }
+    public TicketViewModel Ticket { get; set; } = null!;
 
-    [Required]
-    [MaxLength(100)]
-    public string Title { get; set; } = null!;
-
-    [Required]
-    [MaxLength(200)]
-    public string DestinationPlace { get; set; } = null!;
-
-    [Required]
-    [MaxLength(2000)]
-    public string? Description { get; set; }
+    public PlacesSelectListViewModel PlacesSelectList { get; set; } = null!;
 }

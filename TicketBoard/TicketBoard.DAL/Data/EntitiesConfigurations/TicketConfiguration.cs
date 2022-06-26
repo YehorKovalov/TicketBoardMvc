@@ -12,10 +12,15 @@ public class TicketConfiguration : IEntityTypeConfiguration<TicketEntity>
 
         builder.Property(t => t.TicketId).ValueGeneratedOnAdd();
 
-        builder.Property(t => t.Title).HasMaxLength(100).IsRequired();
-
-        builder.Property(t => t.DestinationPlace).HasMaxLength(200).IsRequired();
-
         builder.Property(t => t.Description).HasMaxLength(2000).IsRequired();
+
+        builder.Property(t => t.Price).IsRequired();
+
+        builder.Property(t => t.Date).HasColumnType("date").IsRequired();
+
+        builder.HasOne(t => t.Place)
+            .WithMany(p => p.Tickets)
+            .HasForeignKey(t => t.PlaceId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

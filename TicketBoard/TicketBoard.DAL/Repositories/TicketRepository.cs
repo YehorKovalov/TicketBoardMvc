@@ -18,7 +18,7 @@ public class TicketRepository : ITicketRepository
         _logger = logger;
     }
 
-    public async Task<TicketEntity?> GetById(int ticketId)
+    public async Task<TicketEntity?> GetById(int ticketId, bool loadRelatedEntities = false)
     {
         if (ticketId <= 0)
         {
@@ -26,60 +26,77 @@ public class TicketRepository : ITicketRepository
             return null;
         }
 
-        var result = await _dbContext.Tickets.FirstOrDefaultAsync(t => t.TicketId == ticketId);
+        var ticket = await _dbContext.Tickets.FirstOrDefaultAsync(t => t.TicketId == ticketId);
 
-        return result;
+        if (ticket == null)
+        {
+            _logger.LogError($"{nameof(GetById)} ---> ticket's not found");
+            return null;
+        }
+        _logger.LogError($"{nameof(GetById)} ---> TicketId = {ticket.TicketId}, Price = {ticket.Price}");
+
+        if (loadRelatedEntities)
+        {
+            await _dbContext
+                .Entry(ticket)
+                .Reference(t => t.Place)
+                .Query()
+                .Include(t => t.Location)
+                .LoadAsync();
+        }
+
+        return ticket;
     }
 
-    public async Task<IEnumerable<TicketEntity>> GetAll()
+    public async Task<IEnumerable<TicketEntity>> GetAll(bool loadRelatedEntities = false)
     {
-        var tickets = await _dbContext.Tickets.ToListAsync();
-        if (!tickets.Any())
+        if (!await _dbContext.Tickets.AnyAsync())
         {
             _logger.LogWarning($"{nameof(GetAll)} ---> Ticket table is empty");
             return Enumerable.Empty<TicketEntity>();
         }
 
-        return tickets;
+        var tickets = _dbContext.Tickets.AsQueryable();
+
+        if (loadRelatedEntities)
+        {
+            tickets = tickets
+                .Include(t => t.Place)
+                .ThenInclude(p => p.Location);
+        }
+
+        var result = await tickets.ToListAsync();
+
+        return result;
     }
 
-    public async Task<int?> Add(string title, string destinationPlace, string? description)
+    public async Task<int?> Add(int placeId, string? description, DateTime date, double price)
     {
-        _logger.LogInformation($"State: {nameof(title)}: {title}; {nameof(destinationPlace)}: {destinationPlace}; {nameof(description)}: {description};");
+        _logger.LogInformation($"State: {nameof(placeId)}: {placeId}; {nameof(date)}: {date}; {nameof(description)}: {description}; {nameof(price)}: {price};");
         var ticket = new TicketEntity
         {
-            Title = title,
-            DestinationPlace = destinationPlace,
+            PlaceId = placeId,
+            Date = date,
+            Price = price,
             Description = description
         };
-
-        if (!StateForAddingIsValid(ticket))
-        {
-            _logger.LogError($"{nameof(Add)} ---> State is not valid");
-            return null;
-        }
         
         var result = await _dbContext.AddAsync(ticket);
         await _dbContext.SaveChangesAsync();
         return result.Entity.TicketId;
     }
 
-    public async Task<int?> Update(int ticketId, string title, string destinationPlace, string? description)
+    public async Task<int?> Update(int ticketId, int placeId, string? description, DateTime date, double price)
     {
-        _logger.LogInformation($"State: {nameof(ticketId)}: {ticketId}; {nameof(title)}: {title}; {nameof(destinationPlace)}: {destinationPlace}; {nameof(description)}: {description};");
+        _logger.LogInformation($"State: {nameof(ticketId)}: {ticketId}; {nameof(placeId)}: {placeId}; {nameof(date)}: {date}; {nameof(description)}: {description}; {nameof(price)}: {price};");
         var ticket = new TicketEntity
         {
             TicketId = ticketId,
-            Title = title,
-            DestinationPlace = destinationPlace,
+            PlaceId = placeId,
+            Date = date,
+            Price = price,
             Description = description
         };
-
-        if (!StateForUpdatingIsValid(ticket))
-        {
-            _logger.LogError($"{nameof(Update)} ---> State is not valid");
-            return -1;
-        }
         
         var result = _dbContext.Update(ticket);
         await _dbContext.SaveChangesAsync();
@@ -100,21 +117,5 @@ public class TicketRepository : ITicketRepository
         await _dbContext.SaveChangesAsync();
 
         return ticketId;
-    }
-
-    private bool StateForAddingIsValid(TicketEntity ticket)
-    {
-        var titleIsValid = !string.IsNullOrWhiteSpace(ticket.Title);
-        var destinationPlaceIsValid = !string.IsNullOrWhiteSpace(ticket.DestinationPlace);
-
-        return titleIsValid && destinationPlaceIsValid;
-    }
-    
-    private bool StateForUpdatingIsValid(TicketEntity ticket)
-    {
-        var titleIsValid = !string.IsNullOrWhiteSpace(ticket.Title);
-        var destinationPlaceIsValid = !string.IsNullOrWhiteSpace(ticket.DestinationPlace);
-        var idIsValid = ticket.TicketId > 0;
-        return titleIsValid && destinationPlaceIsValid && idIsValid;
     }
 }

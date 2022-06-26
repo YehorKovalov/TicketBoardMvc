@@ -12,9 +12,15 @@ public class AppDbContext : DbContext
     }
 
     public DbSet<TicketEntity> Tickets { get; set; } = null!;
+
+    public DbSet<PlaceEntity> Places { get; set; } = null!;
+
+    public DbSet<LocationEntity> Locations { get; set; } = null!;
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfiguration(new TicketConfiguration());
+        modelBuilder.ApplyConfiguration(new PlaceConfiguration());
+        modelBuilder.ApplyConfiguration(new LocationConfiguration());
     }
 }

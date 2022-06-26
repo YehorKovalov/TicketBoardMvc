@@ -4,9 +4,11 @@ namespace TicketBoard.BLL.Services.Abstractions;
 
 public interface ITicketService
 {
-    Task<GetTicketByIdResponse<TicketDto?>?> GetTicketByIdAsync(int? ticketId);
-    Task<GetAllTicketsResponse<TicketDto>> GetAllTicketsAsync();
-    Task<AddTicketResponse<int>> AddTicketAsync(string title, string destinationPlace, string? description);
-    Task<UpdateTicketResponse<int>> UpdateTicketAsync(int ticketId, string title, string destinationPlace, string? description);
+    Task<GetTicketByIdResponse<TicketWithRelatedDataDto?>?> GetTicketWithRelatedDataByIdAsync(int? ticketId);
+    Task<GetAllTicketsResponse<TicketWithoutRelatedDataDto>> GetAllTicketsWithoutRelatedEntitiesAsync();
+    Task<AddTicketResponse<int>> AddTicketAsync(int placeId, string? description, DateTime date, double price);
+    Task<UpdateTicketResponse<int>> UpdateTicketAsync(int ticketId, int placeId, string? description, DateTime date, double price);
     Task<DeleteTicketResponse<int?>> DeleteTicketByIdAsync(int? ticketId);
+    Task<GetAllTicketsResponse<TicketWithRelatedDataDto>> GetAllTicketsWithRelatedEntitiesAsync();
+    Task<GetTicketByIdResponse<TicketWithoutRelatedDataDto?>?> GetTicketWithoutRelatedDataByIdAsync(int? ticketId);
 }

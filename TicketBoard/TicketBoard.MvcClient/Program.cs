@@ -13,7 +13,9 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddAutoMapper(typeof(Program));
 
 builder.Services.AddTransient<ITicketRepository, TicketRepository>();
+builder.Services.AddTransient<IPlaceRepository, PlaceRepository>();
 builder.Services.AddTransient<ITicketService, TicketService>();
+builder.Services.AddTransient<IPlaceService, PlaceService>();
 
 builder.Services.AddDbContextFactory<AppDbContext>(o =>
 {
